@@ -4,13 +4,53 @@ public class FoodBehavior : MonoBehaviour
 {
     private bool hasTouchedRice = false;
     private float fallSpeed;
+    private Rigidbody2D rb; // Reference to the Rigidbody2D
+    private int maxPoints = 100;
+    private int goodPoints = 75;
 
+    private int midPoints = 50;
+    private int minPoints = 25;
+    private int incorrectFoodPenalty = -50;
+    public Sprite[] sprites; // Array to hold the different sprites
+    private Sprite leftCloseSprite;
+    private Sprite leftMidSprite;
+    private Sprite leftFarSprite;
+    private Sprite rightCloseSprite;
+    private Sprite rightMidSprite;
+    private Sprite rightFarSprite;
+
+    private SpriteRenderer spriteRenderer;
+    void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        leftCloseSprite = sprites[0];
+        leftMidSprite = sprites[1];
+        leftFarSprite = sprites[2];
+        rightCloseSprite = sprites[3];
+        rightMidSprite = sprites[4];
+        rightFarSprite = sprites[5];
+
+    }
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        // Disable gravity on the food object initially
+        rb.gravityScale = 0f;
+    }
     public void SetFallSpeed(float speed)
     {
         fallSpeed = speed;
     }
+    void FixedUpdate()
+    {
+        if (!hasTouchedRice)
+        {
+            // Manually update the falling speed based on the fallSpeed value
+            rb.velocity = new Vector2(rb.velocity.x, -fallSpeed); // Apply downward velocity
+        }
+    }
 
-    
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         // Check if the food touches the rice
@@ -32,12 +72,47 @@ public class FoodBehavior : MonoBehaviour
                     // Check if the centers align horizontally
                     float foodCenterX = transform.position.x;
                     float riceCenterX = collision.transform.position.x;
-                    float riceWidth = collision.collider.bounds.size.x / 2;
+                    float riceHalfWidth = collision.collider.bounds.size.x / 2;
+                    float maxThreshold = riceHalfWidth;
+                    float midThreshold = 0.7f * riceHalfWidth;
+                    float minThreshold = 0.4f * riceHalfWidth;
+                    float perfectThreshold = 0.1f * riceHalfWidth;
 
-                    if (Mathf.Abs(foodCenterX - riceCenterX) <= riceWidth)
+                    int points = 0;
+                    SpriteRenderer foodRenderer = GetComponent<SpriteRenderer>();
+
+                    float distance = Mathf.Abs(foodCenterX - riceCenterX);
+                    if (distance <= perfectThreshold)
+                    {
+                        points = maxPoints; // Maximum points
+
+                    }
+                    else if (distance <= minThreshold)
+                    {
+                        points = goodPoints; // Maximum points
+                        foodRenderer.sprite = (foodCenterX < riceCenterX) ? leftCloseSprite : rightCloseSprite;
+
+                    }
+                    else if (distance <= midThreshold)
+                    {
+                        points = midPoints; // Medium points
+                        foodRenderer.sprite = (foodCenterX < riceCenterX) ? leftMidSprite : rightMidSprite;
+
+                    }
+                    else if (distance <= maxThreshold)
+                    {
+                        points = minPoints; // Minimum points
+                        foodRenderer.sprite = (foodCenterX < riceCenterX) ? leftFarSprite : rightFarSprite;
+
+                    }
+                    else
+                    {
+                        points = incorrectFoodPenalty; // Penalty for incorrect food
+                    }
+                    if (distance <= riceHalfWidth)
                     {
                         hasTouchedRice = true;
-                        FindObjectOfType<GameManager>().CheckFood(gameObject);
+                        FindObjectOfType<GameManager>().CheckFood(gameObject, points);
 
                         // Stop moving after touching rice
                         Rigidbody2D rb = GetComponent<Rigidbody2D>();
@@ -51,6 +126,11 @@ public class FoodBehavior : MonoBehaviour
                     }
                 }
             }
+        }
+        if (!hasTouchedRice) 
+        {
+        FindObjectOfType<GameManager>().CheckFood(gameObject, incorrectFoodPenalty);
+
         }
     }
 }

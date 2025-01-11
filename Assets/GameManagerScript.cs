@@ -11,11 +11,17 @@ public class GameManager : MonoBehaviour
     public GameObject giveUpButton; // Reference to the Give Up button
     public GameObject riceObject; // Reference to the rice object
     public GameObject orderDisplay; // UI Image to display the current order
-    public Sprite[] foodSprites; // List of food sprites
+    //public Sprite[] foodSprites; // List of food sprites
     public TextMeshProUGUI pointsText; // TMP UI for displaying points
     public GameObject crossImage;  // Reference to the cross image prefab (UI)
     public GameObject vImage;
-    private Sprite currentOrder; // The current order's food sprite
+    public GameObject BackgroundInit;
+    public GameObject BackgroundGame;
+    public TaggedSprite[] foodSprites; // Array of sprites with tags
+    private TaggedSprite currentOrder; // The current order's sprite and tag
+
+
+    //private Sprite currentOrder; // The current order's food sprite
     private int points = 0; // Player points
     public int level = 1; // Current level
     public int correctOrders = 0; // Counter for correct orders
@@ -27,10 +33,18 @@ public class GameManager : MonoBehaviour
     public float textDisplayDuration = 1f; // Duration for displaying the "Level Up!" text
     private Color originalColor = Color.black; // Original color of the text
 
+    void Start()
+    {
+        // Prevent the screen from going to sleep
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
     public void StartGame()
     {
         // Hide the start panel
         startPanel.SetActive(false);
+        BackgroundInit.SetActive(false);
+        BackgroundGame.SetActive(true);
+
         riceObject.SetActive(true);
         giveUpButton.SetActive(true);
         orderDisplay.SetActive(true);
@@ -54,23 +68,36 @@ public class GameManager : MonoBehaviour
         giveUpButton.SetActive(false);
         orderDisplay.SetActive(false);
         pointsText.gameObject.SetActive(false);
+        BackgroundGame.SetActive(false);
+
+        BackgroundInit.SetActive(true);
 
         startPanel.SetActive(true);
         points = 0;
+        level = 1;
+        correctOrders = 0;
         UpdatePointsDisplay();
         // Reload the current scene to reset the game
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     private void DestroyAllFood()
     {
-        // Find all objects with the "Food" tag
-        GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
+        // Array of tags you want to search for
+        string[] tags = new string[] { "Avocat", "Crevette", "Daurade", "Choco", "Saumon", "Oeuf", "Omelette" ,"Thon"};
 
-        // Loop through each food object and destroy it
-        foreach (GameObject food in foodObjects)
+        // Loop through each tag and find objects with that tag
+        foreach (string tag in tags)
         {
-            Destroy(food);
+            // Find all objects with the current tag
+            GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag(tag);
+
+            // Loop through each object and destroy it
+            foreach (GameObject obj in objectsWithTag)
+            {
+                Destroy(obj);
+            }
         }
+
 
         Debug.Log("All food objects destroyed!");
     }
@@ -80,24 +107,37 @@ public class GameManager : MonoBehaviour
         currentOrder = foodSprites[Random.Range(0, foodSprites.Length)];
 
         // Update the order display UI
-        orderDisplay.GetComponent<Image>().sprite = currentOrder;
+        orderDisplay.GetComponent<Image>().sprite = currentOrder.sprite;
         orderDisplay.SetActive(true);
     }
-    public void CheckFood(GameObject food)
+    public void CheckFood(GameObject food,int add_points)
     {
         SpriteRenderer foodRenderer = food.GetComponent<SpriteRenderer>();
 
-        if (foodRenderer.sprite == currentOrder)
+        if (add_points == -50) 
+        {
+            points -= 50;
+            StartCoroutine(ChangeTextColor(Color.red));
+
+            crossImage.SetActive(true);
+            UpdatePointsDisplay();
+            StartCoroutine(DestroyMistakeFood(food));
+            if (food == null)
+            {
+                crossImage.SetActive(false);
+            }
+            // Destroy the food and feedback image after shrinking
+        }
+        else if (foodRenderer.tag == currentOrder.tag)
         {
             // Correct food
-            points += 100;
+            points += add_points;
             correctOrders++; // Increment correct orders
             StartCoroutine(ChangeTextColor(Color.green));
-
-            StartCoroutine(DestroyGoodFood(food));
-            UpdatePointsDisplay();
-
             vImage.SetActive(true);
+            UpdatePointsDisplay();
+            StartCoroutine(DestroyGoodFood(food));
+
             if (correctOrders >= pointsPerLevel)
             {
                 LevelUp();
@@ -161,9 +201,31 @@ public class GameManager : MonoBehaviour
         // Destroy the food and feedback image after shrinking
         Destroy(food);
     }
-    private IEnumerator DestroyWrongFood(GameObject food)
+    private IEnumerator DestroyMistakeFood(GameObject food)
     {
         Vector3 originalFoodScale = food.transform.localScale;
+
+        float shrinkDuration = 0.3f;  // Duration for shrinking
+        float elapsedTime = 0f;
+
+        // Shrink the food and feedback image at the same time
+        while (elapsedTime < shrinkDuration)
+        {
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        crossImage.SetActive(false);
+
+        // Destroy the food and feedback image after shrinking
+        if (food != null) 
+        {
+            Destroy(food);
+        }
+    }
+    private IEnumerator DestroyWrongFood(GameObject food)
+    {
+        Vector3 originalFoodScale = food.transform.localScale/2;
 
         float shrinkDuration = 0.5f;  // Duration for shrinking
         float elapsedTime = 0f;

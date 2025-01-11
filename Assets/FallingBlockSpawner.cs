@@ -3,11 +3,15 @@ using UnityEngine;
 public class FallingBlockSpawner : MonoBehaviour
 {
     public GameObject[] foodPrefabs; // Array of food prefabs
-    public float spawnInterval = 1f; // Time interval between spawns
-    public float fallSpeed = 1f; // Initial falling speed
+    public float spawnInterval; // Time interval between spawns
+    private float fallSpeed; // Initial falling speed
+    public float InitfallSpeed;
+    public float InitspawnInterval; // Time interval between spawns
 
     private Vector2 screenBounds;
     private bool isSpawning = false; // Tracks whether spawning is active
+    public float levelUpDelay; // Delay time after level up (in seconds)
+    private bool waitingForNextSpawn = false; // Flag to check if we are waiting for the delay
 
     void Start()
     {
@@ -30,6 +34,8 @@ public class FallingBlockSpawner : MonoBehaviour
         if (!isSpawning)
         {
             isSpawning = true;
+            spawnInterval = InitspawnInterval;
+            fallSpeed = InitfallSpeed;
             InvokeRepeating(nameof(SpawnBlock), 0f, spawnInterval);
         }
     }
@@ -69,11 +75,22 @@ public class FallingBlockSpawner : MonoBehaviour
             fallingBlockScript.SetFallSpeed(fallSpeed); // Ensure fallSpeed is dynamically updated
         }
     }
+    private System.Collections.IEnumerator WaitForNextSpawn()
+    {
+        waitingForNextSpawn = true;
+        yield return new WaitForSeconds(levelUpDelay); // Wait for the delay before continuing
+        waitingForNextSpawn = false;
+    }
     public void AdjustSpeeds(float spawnDecrease, float fallIncrease)
     {
+        levelUpDelay = Mathf.Clamp(levelUpDelay * 1.2f, 1f, 10f); // Gradually increase the delay (up to a max value)
+
         spawnInterval = Mathf.Max(0.5f, spawnInterval - spawnDecrease); // Prevent spawn interval from becoming too small
         fallSpeed += fallIncrease;
+        StartCoroutine(WaitForNextSpawn());
+
         Debug.Log($"Adjusted Speeds - Spawn Interval: {spawnInterval}, Fall Speed: {fallSpeed}");
     }
+    
 
 }
