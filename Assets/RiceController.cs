@@ -3,7 +3,7 @@ using UnityEngine;
 public class RiceController : MonoBehaviour
 {
     public float moveSpeed = 5f; // Speed of horizontal movement
-    public float tiltSpeed = 0.5f; // Speed of movement based on phone tilt
+    public float tiltSpeed = 0.1f; // Speed of movement based on phone tilt
     public float touchThreshold = 0.5f; // Threshold for determining left or right side (0.5 means center of screen)
     public GameObject crossImage;  // Reference to the cross image prefab (UI)
     public GameObject vImage;
