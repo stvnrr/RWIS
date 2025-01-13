@@ -3,10 +3,12 @@ using UnityEngine;
 public class RiceController : MonoBehaviour
 {
     public float moveSpeed = 5f; // Speed of horizontal movement
-    public float tiltSpeed = 0.1f; // Speed of movement based on phone tilt
+    public float tiltSpeed = 0.12f; // Speed of movement based on phone tilt
     public float touchThreshold = 0.5f; // Threshold for determining left or right side (0.5 means center of screen)
+    public float tiltThreshold = 0.12f;
     public GameObject crossImage;  // Reference to the cross image prefab (UI)
     public GameObject vImage;
+    public GameManager gameManager;
 
     void Start()
     {
@@ -16,15 +18,33 @@ public class RiceController : MonoBehaviour
 
     void Update()
     {
+        
         // Move rice with tilt if using accelerometer
-        MoveWithTilt();
 
         // Move rice with touch input
-        MoveWithTouch();
         MoveWithKeyboard();
-        // Restrict movement within screen bounds
         RestrictMovement();
         ImagePos();
+        Debug.Log("Current ModeNumber: " + gameManager.ModeNumber);
+
+        
+        if (gameManager.ModeNumber == 0)
+        {
+            Debug.Log("Using Gyro Mode");
+
+            MoveWithTilt();
+
+        }
+        else if (gameManager.ModeNumber == 1)
+        {
+            Debug.Log("Using Touch Mode");
+
+
+            MoveWithTouch();
+
+        }
+        // Restrict movement within screen bounds
+        
     }
 
     void SetInitialPosition()
@@ -39,11 +59,18 @@ public class RiceController : MonoBehaviour
 
     void MoveWithTilt()
     {
+        
         // Use the phone's accelerometer to move the rice
         float horizontal = Input.acceleration.x; // Get tilt input (range from -1 to 1)
+        float sign = horizontal / Mathf.Abs(horizontal);
+        if (sign*horizontal > tiltThreshold) // Use Mathf.Abs and ensure 0.2f for a float comparison
+        {
+            // Move the object horizontally based on the tilt, adjusting speed with tiltSpeed
+            transform.Translate(Vector3.right * (horizontal- sign*tiltThreshold)* moveSpeed * tiltSpeed * Time.deltaTime, Space.World);
+        }
 
-        // Move the rice horizontally based on the tilt, adjusting speed with tiltSpeed
-        transform.Translate(Vector3.right * horizontal * moveSpeed * tiltSpeed * Time.deltaTime);
+        
+          
     }
     void MoveWithKeyboard()
     {
