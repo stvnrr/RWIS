@@ -197,28 +197,12 @@ public class GameManager : MonoBehaviour
     {
         SpriteRenderer foodRenderer = food.GetComponent<SpriteRenderer>();
 
-        if (add_points == -50) 
+        if (add_points == 0) 
         {
-            StartCoroutine(ChangeTextColor(Color.red));
-            LoseLife();
-            if (lives == 0)
-            {
-                GameOverText.SetActive(true);
 
-                StartCoroutine(GameOverTextCoroutine());
-            }
-            crossImage.SetActive(true);
-            BackgroundMiss.SetActive(true);
+            StartCoroutine(DestroyGoodFood(food));
 
-            BackgroundGame.SetActive(false);
-            UpdatePointsDisplay();
-            StartCoroutine(DestroyMistakeFood(food));
-            if (food == null)
-            {
-                crossImage.SetActive(false);
-            }
-            
-            // Destroy the food and feedback image after shrinking
+            Debug.Log("Missed good food! Points: " + points);
         }
         else if (foodRenderer.tag == currentOrder.tag)
         {

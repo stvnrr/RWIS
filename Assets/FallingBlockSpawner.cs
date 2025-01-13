@@ -108,7 +108,7 @@ public class FallingBlockSpawner : MonoBehaviour
         FoodBehavior fallingBlockScript = spawnedBlock.GetComponent<FoodBehavior>();
         if (fallingBlockScript != null)
         {
-            fallingBlockScript.SetFallSpeed(fallSpeed); // Ensure fallSpeed is dynamically updated
+            fallingBlockScript.SetFallSpeed(fallSpeed+Random.Range(-1f, 1f)); // Ensure fallSpeed is dynamically updated
         }
     }
     private System.Collections.IEnumerator WaitForNextSpawn()

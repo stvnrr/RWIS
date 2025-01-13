@@ -1,11 +1,16 @@
 using UnityEngine;
 
+
 public class RiceController : MonoBehaviour
 {
+
+    private Vector3 smoothedAcceleration;
+
     public float moveSpeed = 5f; // Speed of horizontal movement
-    public float tiltSpeed = 0.12f; // Speed of movement based on phone tilt
+    public float tiltSpeed = 0.5f; // Speed of movement based on phone tilt
     public float touchThreshold = 0.5f; // Threshold for determining left or right side (0.5 means center of screen)
-    public float tiltThreshold = 0.12f;
+    public float tiltThreshold = 0.01f;
+    public float smoothFactor = 0.5f; // Adjust this value to get the desired smoothing effect
     public GameObject crossImage;  // Reference to the cross image prefab (UI)
     public GameObject vImage;
     public GameManager gameManager;
@@ -59,17 +64,27 @@ public class RiceController : MonoBehaviour
 
     void MoveWithTilt()
     {
-        
+        // Use the phone's accelerometer to move the rice
+        Vector3 currentAcceleration = Input.acceleration;
+
+        // Apply low-pass filter
+        smoothedAcceleration = Vector3.Lerp(smoothedAcceleration, currentAcceleration, smoothFactor * Time.deltaTime);
+            
         // Use the phone's accelerometer to move the rice
         float horizontal = Input.acceleration.x; // Get tilt input (range from -1 to 1)
-        float sign = horizontal / Mathf.Abs(horizontal);
-        if (sign*horizontal > tiltThreshold) // Use Mathf.Abs and ensure 0.2f for a float comparison
-        {
-            // Move the object horizontally based on the tilt, adjusting speed with tiltSpeed
-            transform.Translate(Vector3.right * (horizontal- sign*tiltThreshold)* moveSpeed * tiltSpeed * Time.deltaTime, Space.World);
-        }
 
-        
+       if (Mathf.Abs(horizontal) > tiltThreshold)
+        {
+            // Calculate the movement, scaled by speed and tilt speed
+            float movement = (horizontal - Mathf.Sign(horizontal) * tiltThreshold) * moveSpeed * tiltSpeed;
+            
+            int maxTiltSpeed = 5;
+            // Clamp the movement to prevent excessive speed
+            movement = Mathf.Clamp(movement, -maxTiltSpeed, maxTiltSpeed);
+
+            // Apply the horizontal movement to the object's position
+            transform.Translate(Vector3.right * movement * Time.deltaTime, Space.World);
+        }
           
     }
     void MoveWithKeyboard()
@@ -84,30 +99,57 @@ public class RiceController : MonoBehaviour
         }
     }
 
-    void MoveWithTouch()
-{
-    // Check if there is at least one touch
-    if (Input.touchCount > 0)
-    {
-        Touch touch = Input.GetTouch(0); // Get the first touch
+private float touchStartTime = 0f; // Tracks the time when the touch starts
+public float maxSpeed = 5f; // Maximum speed limit when the touch is held longer
 
-        // Check the touch phase to handle continuous movement
-        if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+
+    void MoveWithTouch()
+    {
+        // Check if there is at least one touch
+        if (Input.touchCount > 0)
         {
-            // Determine the horizontal position of the touch
-            if (touch.position.x < Screen.width * 0.5f)
+            Touch touch = Input.GetTouch(0); // Get the first touch
+
+            // Handle touch start
+            if (touch.phase == TouchPhase.Began)
             {
-                // Move left if touch is on the left side
-                transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
+                touchStartTime = Time.time; // Record the time when the touch starts
             }
-            else
+
+            // Handle touch move or stationary
+            if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
             {
-                // Move right if touch is on the right side
-                transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+                // Calculate the touch duration
+                float touchDuration = Time.time - touchStartTime;
+
+                // Calculate the speed based on how long the touch has been held
+                float currentSpeed = Mathf.Min(touchDuration * 40f, maxSpeed); // Increase speed over time, with a maximum speed limit
+
+                // Determine the horizontal position of the touch
+                if (touch.position.x < Screen.width * 0.5f)
+                {
+                    // Move left, increasing speed the longer the touch is held
+                    MoveLeft(currentSpeed);
+                }
+                else
+                {
+                    // Move right, increasing speed the longer the touch is held
+                    MoveRight(currentSpeed);
+                }
             }
         }
     }
-}
+
+    // Helper methods for movement
+    void MoveLeft(float speed)
+    {
+        transform.Translate(Vector3.left * speed * Time.deltaTime);
+    }
+
+    void MoveRight(float speed)
+    {
+        transform.Translate(Vector3.right * speed * Time.deltaTime);
+    }
 
 
     void RestrictMovement()

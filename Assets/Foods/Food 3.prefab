@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 797995612339441593}
   - component: {fileID: 7303623030864834075}
   - component: {fileID: 6586899966299029389}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Food 3
   m_TagString: Crevette
   m_Icon: {fileID: 0}

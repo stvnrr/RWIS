@@ -11,6 +11,7 @@ public class MusicControllerUI : MonoBehaviour
     {
         // Get the AudioSource component attached to this GameObject
         audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
     }
 
     public void PlayMusic()

@@ -73,10 +73,10 @@ public class FoodBehavior : MonoBehaviour
                     float foodCenterX = transform.position.x;
                     float riceCenterX = collision.transform.position.x;
                     float riceHalfWidth = collision.collider.bounds.size.x / 2;
-                    float maxThreshold = riceHalfWidth;
+                    float maxThreshold = riceHalfWidth+0.1f;
                     float midThreshold = 0.7f * riceHalfWidth;
                     float minThreshold = 0.4f * riceHalfWidth;
-                    float perfectThreshold = 0.1f * riceHalfWidth;
+                    float perfectThreshold = 0.2f * riceHalfWidth;
 
                     int points = 0;
                     SpriteRenderer foodRenderer = GetComponent<SpriteRenderer>();
@@ -107,7 +107,10 @@ public class FoodBehavior : MonoBehaviour
                     }
                     else
                     {
-                        points = incorrectFoodPenalty; // Penalty for incorrect food
+                        hasTouchedRice = true;
+                        points = 0; // Penalty for incorrect food
+                        FindObjectOfType<GameManager>().CheckFood(gameObject, points);
+                        break;
                     }
                     if (distance <= riceHalfWidth)
                     {
@@ -129,7 +132,7 @@ public class FoodBehavior : MonoBehaviour
         }
         if (!hasTouchedRice) 
         {
-        FindObjectOfType<GameManager>().CheckFood(gameObject, incorrectFoodPenalty);
+        FindObjectOfType<GameManager>().CheckFood(gameObject, 0);
 
         }
     }

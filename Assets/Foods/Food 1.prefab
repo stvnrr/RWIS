@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4798072043794485943}
   - component: {fileID: 7485964531559357901}
   - component: {fileID: 3731749277040747798}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Food 1
   m_TagString: Avocat
   m_Icon: {fileID: 0}
