@@ -107,10 +107,7 @@ public class FoodBehavior : MonoBehaviour
                     }
                     else
                     {
-                        hasTouchedRice = true;
-                        points = 0; // Penalty for incorrect food
-                        FindObjectOfType<GameManager>().CheckFood(gameObject, points);
-                        break;
+                        points = incorrectFoodPenalty; // Penalty for incorrect food
                     }
                     if (distance <= riceHalfWidth)
                     {
@@ -132,7 +129,7 @@ public class FoodBehavior : MonoBehaviour
         }
         if (!hasTouchedRice) 
         {
-        FindObjectOfType<GameManager>().CheckFood(gameObject, 0);
+        FindObjectOfType<GameManager>().CheckFood(gameObject, incorrectFoodPenalty);
 
         }
     }

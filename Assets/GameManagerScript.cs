@@ -197,12 +197,28 @@ public class GameManager : MonoBehaviour
     {
         SpriteRenderer foodRenderer = food.GetComponent<SpriteRenderer>();
 
-        if (add_points == 0) 
+        if (add_points == -50) 
         {
+            StartCoroutine(ChangeTextColor(Color.red));
+            LoseLife();
+            if (lives == 0)
+            {
+                GameOverText.SetActive(true);
 
-            StartCoroutine(DestroyGoodFood(food));
+                StartCoroutine(GameOverTextCoroutine());
+            }
+            crossImage.SetActive(true);
+            BackgroundMiss.SetActive(true);
 
-            Debug.Log("Missed good food! Points: " + points);
+            BackgroundGame.SetActive(false);
+            UpdatePointsDisplay();
+            StartCoroutine(DestroyMistakeFood(food));
+            if (food == null)
+            {
+                crossImage.SetActive(false);
+            }
+            
+            // Destroy the food and feedback image after shrinking
         }
         else if (foodRenderer.tag == currentOrder.tag)
         {
@@ -394,7 +410,7 @@ public class GameManager : MonoBehaviour
     {
         Vector3 originalGameOverScale = GameOverText.transform.localScale;
 
-        float shrinkDuration = 1f;  // Duration for shrinking
+        float shrinkDuration = 1.5f;  // Duration for shrinking
         float elapsedTime = 0f;
 
         // Shrink the food and feedback image at the same time
@@ -504,6 +520,7 @@ public class GameManager : MonoBehaviour
         // Optionally, you could show the best scores here as well
         DisplayBestScores();
         StartCoroutine(DisplayBestScoreCoroutine());
+        scoresButton.SetActive(true);
 
     }
     private IEnumerator DisplayBestScoreCoroutine()
@@ -516,7 +533,6 @@ public class GameManager : MonoBehaviour
 
         // After 3 seconds, deactivate best score text and activate the Scores button
         bestScoreText.SetActive(false);
-        scoresButton.SetActive(true);
     }
     public void ShowScores()
     {
