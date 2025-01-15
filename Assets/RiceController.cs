@@ -30,19 +30,16 @@ public class RiceController : MonoBehaviour
         MoveWithKeyboard();
         RestrictMovement();
         ImagePos();
-        Debug.Log("Current ModeNumber: " + gameManager.ModeNumber);
 
         
         if (gameManager.ModeNumber == 0)
         {
-            Debug.Log("Using Gyro Mode");
 
             MoveWithTilt();
 
         }
         else if (gameManager.ModeNumber == 1)
         {
-            Debug.Log("Using Touch Mode");
 
 
             MoveWithTouch();

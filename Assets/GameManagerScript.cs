@@ -114,7 +114,6 @@ public class GameManager : MonoBehaviour
         spawner.StartSpawning();
 
         // Start the game (enable food drop, etc.)
-        Debug.Log("Game Started!");
     }
 
     public TaggedSprite getCurrentOrder()
@@ -182,7 +181,6 @@ public class GameManager : MonoBehaviour
         }
 
 
-        Debug.Log("All food objects destroyed!");
     }
     private void GenerateOrder()
     {
@@ -197,30 +195,7 @@ public class GameManager : MonoBehaviour
     {
         SpriteRenderer foodRenderer = food.GetComponent<SpriteRenderer>();
 
-        if (add_points == -50) 
-        {
-            StartCoroutine(ChangeTextColor(Color.red));
-            LoseLife();
-            if (lives == 0)
-            {
-                GameOverText.SetActive(true);
-
-                StartCoroutine(GameOverTextCoroutine());
-            }
-            crossImage.SetActive(true);
-            BackgroundMiss.SetActive(true);
-
-            BackgroundGame.SetActive(false);
-            UpdatePointsDisplay();
-            StartCoroutine(DestroyMistakeFood(food));
-            if (food == null)
-            {
-                crossImage.SetActive(false);
-            }
-            
-            // Destroy the food and feedback image after shrinking
-        }
-        else if (foodRenderer.tag == currentOrder.tag)
+        if (foodRenderer.tag == currentOrder.tag && add_points > 0)
         {
             // Correct food
             points += add_points;
@@ -237,8 +212,50 @@ public class GameManager : MonoBehaviour
 
             GenerateOrder();
 
-            UpdatePointsDisplay();
-            Debug.Log("Correct food! Points: " + points);
+        }
+        else if (foodRenderer.tag == currentOrder.tag && add_points == 0)
+        {
+            // Incorrect food
+            StartCoroutine(ChangeTextColor(Color.red));
+
+            BackgroundMiss.SetActive(true);
+
+            BackgroundGame.SetActive(false);
+
+            StartCoroutine(DestroyMistakeFood(food));
+
+            
+
+
+
+
+        }
+        else if (foodRenderer.tag != currentOrder.tag && add_points == 0)
+        {
+            // Incorrect food
+            StartCoroutine(ChangeTextColor(Color.red));
+            LoseLife();
+            if (lives == 0)
+            {
+                GameOverText.SetActive(true);
+
+                StartCoroutine(GameOverTextCoroutine());
+            }
+            crossImage.SetActive(true);
+            BackgroundMiss.SetActive(true);
+
+            BackgroundGame.SetActive(false);
+
+            StartCoroutine(DestroyMistakeFood(food));
+
+            if (food == null)
+            {
+                crossImage.SetActive(false);
+            }
+
+
+
+
         }
         else
         {
@@ -255,7 +272,6 @@ public class GameManager : MonoBehaviour
             BackgroundMiss.SetActive(true);
 
             BackgroundGame.SetActive(false);
-            UpdatePointsDisplay();
 
             StartCoroutine(DestroyWrongFood(food));
 
@@ -264,12 +280,7 @@ public class GameManager : MonoBehaviour
                 crossImage.SetActive(false);
             }
 
-
-
-            Debug.Log("Incorrect food! Points: " + points);
-            
         }
-
         // Update points display
 
         // Destroy the food
@@ -284,7 +295,6 @@ public class GameManager : MonoBehaviour
         ShowLevelUpText();
 
         spawner.AdjustSpeeds(spawnSpeedIncrease, fallSpeedIncrease); // Adjust speeds
-        Debug.Log("Level Up! Current Level: " + level);
     }
     private IEnumerator DestroyGoodFood(GameObject food)
     {
@@ -484,13 +494,17 @@ public class GameManager : MonoBehaviour
     private void SaveBestScoresToPrefs(List<int> bestScores)
     {
         string scoresString = string.Join(",", bestScores);
-        PlayerPrefs.SetString(BestScoresKey, scoresString);
+        string key = $"{BestScoresKey}_{ModeNumber}"; // Use a unique key for each mode
+
+        PlayerPrefs.SetString(key, scoresString);
         PlayerPrefs.Save();
     }
 
     private List<int> LoadBestScoresFromPrefs()
     {
-        string scoresString = PlayerPrefs.GetString(BestScoresKey, "");
+        string key = $"{BestScoresKey}_{ModeNumber}"; // Use a unique key for each mode
+
+        string scoresString = PlayerPrefs.GetString(key, "");
 
         if (string.IsNullOrEmpty(scoresString))
         {
@@ -506,7 +520,14 @@ public class GameManager : MonoBehaviour
         List<int> bestScores = LoadBestScoresFromPrefs();
 
         // Display the best scores as a string
-        bestScoresText.text = "";
+        if (ModeNumber == 0)
+        {
+            bestScoresText.text = "Gyroscopic Mode :\n";
+        }
+        else
+        {
+            bestScoresText.text = "Touch Mode :\n";
+        }
         foreach (int score in bestScores)
         {
             bestScoresText.text += score.ToString() + " points\n";

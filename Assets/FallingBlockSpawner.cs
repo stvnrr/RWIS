@@ -131,7 +131,6 @@ public class FallingBlockSpawner : MonoBehaviour
         RestartSpawning();
 
 
-        Debug.Log($"Adjusted Speeds - Spawn Interval: {spawnInterval}, Fall Speed: {fallSpeed}");
     }
     private void RestartSpawning()
     {

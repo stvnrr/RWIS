@@ -1,0 +1,10 @@
+diff a/Assets/FoodBehaviour.cs b/Assets/FoodBehaviour.cs	(rejected hunks)
+@@ -132,7 +132,7 @@
+         }
+         if (!hasTouchedRice) 
+         {
+-        FindObjectOfType<GameManager>().CheckFood(gameObject, incorrectFoodPenalty);
++        FindObjectOfType<GameManager>().CheckFood(gameObject, 0);
+ 
+         }
+     }

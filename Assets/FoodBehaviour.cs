@@ -5,12 +5,12 @@ public class FoodBehavior : MonoBehaviour
     private bool hasTouchedRice = false;
     private float fallSpeed;
     private Rigidbody2D rb; // Reference to the Rigidbody2D
-    private int maxPoints = 100;
-    private int goodPoints = 75;
+    private int maxPoints = 5;
+    private int goodPoints = 3;
 
-    private int midPoints = 50;
-    private int minPoints = 25;
-    private int incorrectFoodPenalty = -50;
+    private int midPoints = 2;
+    private int minPoints = 1;
+    private int incorrectFoodPenalty = 0;
     public Sprite[] sprites; // Array to hold the different sprites
     private Sprite leftCloseSprite;
     private Sprite leftMidSprite;
@@ -112,6 +112,10 @@ public class FoodBehavior : MonoBehaviour
                     if (distance <= riceHalfWidth)
                     {
                         hasTouchedRice = true;
+                        Vector3 newPosition = transform.position;
+                        newPosition.x = collision.transform.position.x;
+                        transform.position = newPosition;
+
                         FindObjectOfType<GameManager>().CheckFood(gameObject, points);
 
                         // Stop moving after touching rice
@@ -121,7 +125,6 @@ public class FoodBehavior : MonoBehaviour
                         // Make the food a child of the rice
                         transform.SetParent(collision.transform);
 
-                        Debug.Log("Food attached to the top of the rice!");
                         break;
                     }
                 }
