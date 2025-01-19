@@ -13,8 +13,10 @@ public class GameManager : MonoBehaviour
     public GameObject bestScoreText; // Reference to the Best Score Text object
     public GameObject scoresButton;  // Reference to the "Scores" button
     public GameObject settingsButton;    // Reference to the "Back" button (to go to the menu)
+    public GameObject sushiTeamButton;  // Reference to the "Sushi Team" button
     public GameObject backButton;    // Reference to the "Back" button (to go to the menu)
     public GameObject backButtonSettings;    // Reference to the "Back" button (to go to the menu)
+    public GameObject backButtonSushiTeam;    // Reference to the "Back" button (to go to the menu)
     public GameObject MusicButton;    // Reference to the "Back" button (to go to the menu)
     public GameObject SoundButton;    // Reference to the "Back" button (to go to the menu)
 
@@ -24,6 +26,15 @@ public class GameManager : MonoBehaviour
     public GameObject checkImageTouch; // The first image (default)
     public GameObject checkImageSound; // The first image (default)
     public GameObject checkImageMusic; // The first image (default)
+
+    public GameObject PersoClaraButton;    // Reference to the "PersoClara" button
+    public GameObject PersoStevenButton;    // Reference to the "PersoSteven" button
+    public GameObject PersoNicolasButton;    // Reference to the "PersoNicolas" button
+
+    public GameObject EtiquetteClaraButton;    // Reference to the "PersoClara" button
+    public GameObject EtiquetteStevenButton;    // Reference to the "PersoSteven" button
+    public GameObject EtiquetteNicolasButton;    // Reference to the "PersoNicolas" button
+
 
     public int ModeNumber = 1;    // Reference to the "Back" button (to go to the menu)
     public int MusicNumber = 1;
@@ -43,6 +54,7 @@ public class GameManager : MonoBehaviour
     public GameObject BackgroundGame;
     public GameObject BackgroundMiss;
     public GameObject RulesImage;
+    public GameObject BackgroundSushiTeam;
 
     public TaggedSprite[] foodSprites; // Array of sprites with tags
     private TaggedSprite currentOrder; // The current order's sprite and tag
@@ -587,17 +599,73 @@ public class GameManager : MonoBehaviour
         MusicButton.SetActive(false);
         SoundButton.SetActive(false);
         backButtonSettings.SetActive(false);
+        backButtonSushiTeam.SetActive(false);
         uncheckImages();
         BackgroundInit.SetActive(true);
         RulesImage.SetActive(false);
+        BackgroundSushiTeam.SetActive(false);
         scoresButton.SetActive(true);
         startPanel.SetActive(true);
+        sushiTeamButton.SetActive(true);
+        PersoClaraButton.SetActive(false);
+        PersoStevenButton.SetActive(false);
+        PersoNicolasButton.SetActive(false);
+        EtiquetteClaraButton.SetActive(false);
+        EtiquetteStevenButton.SetActive(false);
+        EtiquetteNicolasButton.SetActive(false);
 
 
         // Here you would load the initial menu scene
         // SceneManager.LoadScene("MenuSceneName");
     }
+    public void SushiTeam()
+    {
+        startPanel.SetActive(false);
+        scoresButton.SetActive(false);
+        sushiTeamButton.SetActive(false);
+        BackgroundSushiTeam.SetActive(true);
+        BackgroundInit.SetActive(false);
+        // Show the current score when the "Scores" button is pressed
+        backButtonSushiTeam.SetActive(true);
+        PersoClaraButton.SetActive(true);
+        PersoStevenButton.SetActive(true);
+        PersoNicolasButton.SetActive(true);
+        EtiquetteClaraButton.SetActive(false);
+        EtiquetteStevenButton.SetActive(false);
+        EtiquetteNicolasButton.SetActive(false);
+    }
 
+    public void PersoClara()
+    {
+        EtiquetteClaraButton.SetActive(true);
+        EtiquetteStevenButton.SetActive(false);
+        EtiquetteNicolasButton.SetActive(false);
+    }
+
+    public void PersoSteven()
+    {
+        EtiquetteStevenButton.SetActive(true);
+        EtiquetteClaraButton.SetActive(false);
+        EtiquetteNicolasButton.SetActive(false);
+    }
+    public void PersoNicolas()
+    {
+        EtiquetteNicolasButton.SetActive(true);
+        EtiquetteClaraButton.SetActive(false);
+        EtiquetteStevenButton.SetActive(false);
+    }
+    public void EtiquetteClara()
+    {
+        EtiquetteClaraButton.SetActive(false);
+    }
+    public void EtiquetteSteven()
+    {
+        EtiquetteStevenButton.SetActive(false);
+    }
+    public void EtiquetteNicolas()
+    {
+        EtiquetteNicolasButton.SetActive(false);
+    }
 
     public void Sound()
     {
